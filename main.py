@@ -18,7 +18,7 @@ class Line:
 
 
 class Window:
-    def __init__(self, width: int, height: int, bg: str = "gray"):
+    def __init__(self, width: int, height: int, bg: str = "black"):
         self.__root = Tk()
         self.__root.title("Maze Solver")
         self.__canvas = Canvas(self.__root, width=width, height=height, bg=bg)
@@ -60,14 +60,21 @@ class Cell:
         self.__y1 = y1
         self.__y2 = y2
         if self.has_top_wall:
-            self.__win.draw_line(Line(Point(x1, y1), Point(x2, y1)), "black")
+            self.__win.draw_line(Line(Point(x1, y1), Point(x2, y1)), "white")
         if self.has_bottom_wall:
-            self.__win.draw_line(Line(Point(x2, y2), Point(x1, y2)), "black")
+            self.__win.draw_line(Line(Point(x2, y2), Point(x1, y2)), "white")
         if self.has_left_wall:
-            self.__win.draw_line(Line(Point(x1, y2), Point(x1, y1)), "black")
+            self.__win.draw_line(Line(Point(x1, y2), Point(x1, y1)), "white")
         if self.has_right_wall:
-            self.__win.draw_line(Line(Point(x2, y1), Point(x2, y2)), "black")
+            self.__win.draw_line(Line(Point(x2, y1), Point(x2, y2)), "white")
 
+    def draw_move(self, to_cell: "Cell", undo: bool = False):
+        color = "gray" if undo else "red"
+        self_center = Point((self.__x1 + self.__x2) / 2, (self.__y1 + self.__y2) / 2)
+        to_center = Point(
+            (to_cell.__x1 + to_cell.__x2) / 2, (to_cell.__y1 + to_cell.__y2) / 2
+        )
+        self.__win.draw_line(Line(self_center, to_center), color)
 
 def main():
     width, height, margin = 800, 600, 10
@@ -99,6 +106,23 @@ def main():
     c3.has_top_wall = False
     c3.has_bottom_wall = False
     c3.draw(150, 50, 200, 100)
+
+    # test moves: red forward, gray undo
+    c1.draw_move(c2)
+    c2.draw_move(c3, undo=True)
+
+    # corridor test: cells with empty space between them
+    a = Cell(win)
+    a.draw(50, 150, 100, 200)
+
+    b = Cell(win)
+    b.draw(200, 150, 250, 200)
+
+    c = Cell(win)
+    c.draw(350, 150, 400, 200)
+
+    a.draw_move(b)               # red across the gap
+    b.draw_move(c, undo=True)    # gray across the gap
 
     win.wait_for_close()
 
