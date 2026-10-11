@@ -13,7 +13,7 @@ class Line:
         self.point2 = point2
 
     def draw(self, canvas: Canvas, fill_color: str = "orange"):
-        [x1, y1, x2, y2] = [self.point1.x, self.point1.y, self.point2.x, self.point2.y]
+        x1, y1, x2, y2 = self.point1.x, self.point1.y, self.point2.x, self.point2.y
         canvas.create_line(x1, y1, x2, y2, fill=fill_color, width=2)
 
 
@@ -42,6 +42,33 @@ class Window:
         line.draw(self.__canvas, fill_color)
 
 
+class Cell:
+    def __init__(self, win: Window):
+        self.has_left_wall = True
+        self.has_right_wall = True
+        self.has_top_wall = True
+        self.has_bottom_wall = True
+        self.__x1 = -1.0
+        self.__x2 = -1.0
+        self.__y1 = -1.0
+        self.__y2 = -1.0
+        self.__win = win
+
+    def draw(self, x1, y1, x2, y2):
+        self.__x1 = x1
+        self.__x2 = x2
+        self.__y1 = y1
+        self.__y2 = y2
+        if self.has_top_wall:
+            self.__win.draw_line(Line(Point(x1, y1), Point(x2, y1)), "black")
+        if self.has_bottom_wall:
+            self.__win.draw_line(Line(Point(x2, y2), Point(x1, y2)), "black")
+        if self.has_left_wall:
+            self.__win.draw_line(Line(Point(x1, y2), Point(x1, y1)), "black")
+        if self.has_right_wall:
+            self.__win.draw_line(Line(Point(x2, y1), Point(x2, y2)), "black")
+
+
 def main():
     width, height, margin = 800, 600, 10
     win = Window(width, height)
@@ -59,6 +86,19 @@ def main():
     # medium horizontal line centered on the screen
     cx, cy, half = width // 2, height // 2, 100
     win.draw_line(Line(Point(cx - half, cy), Point(cx + half, cy)), "orange")
+
+    # test cells: all walls / no left wall / no top or bottom
+    c1 = Cell(win)
+    c1.draw(50, 50, 100, 100)
+
+    c2 = Cell(win)
+    c2.has_left_wall = False
+    c2.draw(100, 50, 150, 100)
+
+    c3 = Cell(win)
+    c3.has_top_wall = False
+    c3.has_bottom_wall = False
+    c3.draw(150, 50, 200, 100)
 
     win.wait_for_close()
 
