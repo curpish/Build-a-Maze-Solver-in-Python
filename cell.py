@@ -7,6 +7,7 @@ class Cell:
         self.has_right_wall = True
         self.has_top_wall = True
         self.has_bottom_wall = True
+        self.visited = False
         self.__x1 = -1.0
         self.__x2 = -1.0
         self.__y1 = -1.0
@@ -20,9 +21,16 @@ class Cell:
         self.__y2 = y2
         if self.__win is None:
             return
-        # A missing wall is drawn in the background color so it erases a wall
-        # that was drawn earlier. Left and right come last so they restore the
-        # corner pixels an erased top or bottom edge would overlap.
+        missing = (
+            (self.has_top_wall, Point(x1 + 1, y1), Point(x2 - 1, y1)),
+            (self.has_bottom_wall, Point(x1 + 1, y2), Point(x2 - 1, y2)),
+            (self.has_left_wall, Point(x1, y1 + 1), Point(x1, y2 - 1)),
+            (self.has_right_wall, Point(x2, y1 + 1), Point(x2, y2 - 1)),
+        )
+        for present, start, end in missing:
+            if not present:
+                self.__win.draw_line(Line(start, end), self.__win.bg)
+
         walls = (
             (self.has_top_wall, Point(x1, y1), Point(x2, y1)),
             (self.has_bottom_wall, Point(x2, y2), Point(x1, y2)),
@@ -30,8 +38,8 @@ class Cell:
             (self.has_right_wall, Point(x2, y1), Point(x2, y2)),
         )
         for present, start, end in walls:
-            color = "white" if present else self.__win.bg
-            self.__win.draw_line(Line(start, end), color)
+            if present:
+                self.__win.draw_line(Line(start, end), "white")
 
     def draw_move(self, to_cell: "Cell", undo: bool = False):
         if self.__win is None:
