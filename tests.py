@@ -52,6 +52,45 @@ class Tests(unittest.TestCase):
         self.assertEqual(cell._Cell__x2, 35)
         self.assertEqual(cell._Cell__y2, 28)
 
+    def test_break_entrance_and_exit(self):
+        m1 = Maze(0, 0, 4, 3, 10, 10)
+        cells = m1._Maze__cells
+        entrance, exit_ = cells[0][0], cells[-1][-1]
+
+        self.assertFalse(entrance.has_top_wall)
+        self.assertFalse(exit_.has_bottom_wall)
+
+        # only those two walls are gone
+        self.assertTrue(entrance.has_bottom_wall)
+        self.assertTrue(entrance.has_left_wall)
+        self.assertTrue(entrance.has_right_wall)
+        self.assertTrue(exit_.has_top_wall)
+        self.assertTrue(exit_.has_left_wall)
+        self.assertTrue(exit_.has_right_wall)
+
+        # an interior cell is untouched
+        middle = cells[1][1]
+        self.assertTrue(middle.has_top_wall)
+        self.assertTrue(middle.has_bottom_wall)
+
+    def test_break_entrance_and_exit_called_directly(self):
+        m1 = Maze(0, 0, 4, 3, 10, 10)
+        cells = m1._Maze__cells
+        cells[0][0].has_top_wall = True
+        cells[-1][-1].has_bottom_wall = True
+
+        m1._Maze__break_entrance_and_exit()
+
+        self.assertFalse(cells[0][0].has_top_wall)
+        self.assertFalse(cells[-1][-1].has_bottom_wall)
+
+    def test_break_entrance_and_exit_single_cell(self):
+        # entrance and exit are the same cell
+        m1 = Maze(0, 0, 1, 1, 10, 10)
+        cell = m1._Maze__cells[0][0]
+        self.assertFalse(cell.has_top_wall)
+        self.assertFalse(cell.has_bottom_wall)
+
     def test_cell_without_window_does_not_draw(self):
         c = Cell()
         c.draw(0, 0, 10, 10)

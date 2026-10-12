@@ -24,7 +24,12 @@ class Window:
         self.__canvas = Canvas(self.__root, width=width, height=height, bg=bg)
         self.__canvas.pack(fill=BOTH, expand=True)
         self.__running = False
+        self.__bg = bg
         self.__root.protocol("WM_DELETE_WINDOW", self.close)
+
+    @property
+    def bg(self) -> str:
+        return self.__bg
 
     def redraw(self):
         Tk.update_idletasks(self.__root)

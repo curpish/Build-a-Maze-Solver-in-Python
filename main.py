@@ -16,8 +16,8 @@ def main():
     for start, end in zip(corners, corners[1:] + corners[:1]):
         win.draw_line(Line(start, end), "navy")
 
-    num_rows = 20
-    num_cols = 30
+    num_rows = 12
+    num_cols = 20
     margin = 100
     screen_x = 800
     screen_y = 600
